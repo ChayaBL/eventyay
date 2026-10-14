@@ -1388,15 +1388,20 @@ class EventLog(EventPermissionRequiredMixin, PaginationMixin, ListView):
 
         query = self.request.GET.get('q', '').strip()
         if query:
-            qs = qs.filter(
+            search_filter = (
                 Q(action_type__icontains=query)
-                | Q(data__icontains=query)
                 | Q(user__fullname__icontains=query)
                 | Q(user__email__icontains=query)
                 | Q(device__name__icontains=query)
                 | Q(api_token__name__icontains=query)
                 | Q(oauth_application__name__icontains=query)
             )
+            if self.request.user.has_active_staff_session(
+                self.request.session.session_key
+            ):
+                search_filter |= Q(data__icontains=query)
+
+            qs = qs.filter(search_filter)
 
         return qs
 
