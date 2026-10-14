@@ -48,7 +48,30 @@
                     return;
                 }
 
+                var focusedControl = currentResults.contains(document.activeElement)
+                    ? document.activeElement
+                    : null;
+                var focusSelector = null;
+                if (focusedControl) {
+                    if (focusedControl.matches(".event-log-search-form input[name='q']")) {
+                        focusSelector = ".event-log-search-form input[name='q']";
+                    } else if (focusedControl.matches(".pagination a")) {
+                        focusSelector = ".pagination a[href='" +
+                            focusedControl.getAttribute("href") + "']";
+                    }
+                }
+
                 currentResults.replaceWith(newResults);
+
+                if (focusSelector) {
+                    var replacementFocus = document.querySelector(
+                        resultsSelector + " " + focusSelector
+                    );
+                    if (replacementFocus) {
+                        replacementFocus.focus();
+                    }
+                }
+
                 if (updateHistory) {
                     window.history.pushState({}, "", target.href);
                 }
