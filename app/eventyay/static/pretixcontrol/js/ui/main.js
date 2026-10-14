@@ -1253,57 +1253,6 @@ $(function () {
         updateVouchersDeleteBtn();
     }
 
-    // Event log AJAX search and pagination
-    function loadEventLogResults(url, params) {
-        var query = params.toString();
-        var targetUrl = url + (query ? "?" + query : "");
-
-        $.get(targetUrl)
-            .done(function (html) {
-                var $page = $("<div>").append($.parseHTML(html));
-                var $results = $page.find(".event-log-results").first();
-
-                if (!$results.length) {
-                    window.location.href = targetUrl;
-                    return;
-                }
-
-                $(".event-log-results").replaceWith($results);
-                window.history.pushState({}, "", targetUrl);
-            })
-            .fail(function () {
-                window.location.href = targetUrl;
-            });
-    }
-
-    $(document).on("submit", ".event-log-search-form", function (e) {
-        e.preventDefault();
-        var params = new URLSearchParams(new FormData(this));
-        params.delete("page");
-        loadEventLogResults(this.action || window.location.pathname, params);
-    });
-
-    $(document).on("click", ".event-log-results .pagination a, .event-log-results a[href*='page_size=']", function (e) {
-        e.preventDefault();
-        var url = new URL(this.href, window.location.origin);
-        loadEventLogResults(url.pathname, url.searchParams);
-    });
-
-    window.addEventListener("popstate", function () {
-        $.get(window.location.href)
-            .done(function (html) {
-                var $page = $("<div>").append($.parseHTML(html));
-                var $results = $page.find(".event-log-results").first();
-                if ($results.length) {
-                    $(".event-log-results").replaceWith($results);
-                } else {
-                    window.location.reload();
-                }
-            })
-            .fail(function () {
-                window.location.reload();
-            });
-    });
     $("#ajaxerr").on("click", ".ajaxerr-close", ajaxErrDialog.hide);
     moment.locale($("body").attr("data-datetimelocale"));
 });
