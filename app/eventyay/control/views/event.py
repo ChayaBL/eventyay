@@ -14,7 +14,7 @@ from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.core.files import File
 from django.db import transaction
-from django.db.models import ProtectedError
+from django.db.models import ProtectedError, Q
 from django.forms import inlineformset_factory
 from django.http import (
     Http404,
@@ -1292,6 +1292,18 @@ class EventLog(EventPermissionRequiredMixin, PaginationMixin, ListView):
 
             if self.request.GET.get('object'):
                 qs = qs.filter(object_id=self.request.GET.get('object'))
+
+        query = self.request.GET.get('q', '').strip()
+        if query:
+            qs = qs.filter(
+                Q(action_type__icontains=query)
+                | Q(data__icontains=query)
+                | Q(user__fullname__icontains=query)
+                | Q(user__email__icontains=query)
+                | Q(device__name__icontains=query)
+                | Q(api_token__name__icontains=query)
+                | Q(oauth_application__name__icontains=query)
+            )
 
         return qs
 
