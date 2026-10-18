@@ -1407,6 +1407,10 @@ class EventLog(EventPermissionRequiredMixin, PaginationMixin, ListView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data()
+        params = self.request.GET.copy()
+        params.pop('q', None)
+        params.pop('page', None)
+        ctx['clear_search_query'] = params.urlencode()
         ctx['userlist'] = self.request.event.logentry_set.order_by().distinct().values('user__id', 'user__email')
         ctx['devicelist'] = (
             self.request.event.logentry_set.order_by('device__name').distinct().values('device__id', 'device__name')

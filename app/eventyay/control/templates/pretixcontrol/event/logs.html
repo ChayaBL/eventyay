@@ -12,7 +12,7 @@
         <p>
             <input type="search" name="q" class="form-control" aria-label="{% trans 'Search event logs' %}" placeholder="{% trans 'Search event logs…' %}" value="{{ request.GET.q|default:'' }}">
             {% if request.GET.q %}
-                <a class="btn btn-default event-log-clear-search" href="?{% if request.GET.user %}user={{ request.GET.user|urlencode }}{% if request.GET.content_type or request.GET.object or request.GET.page_size %}&amp;{% endif %}{% endif %}{% if request.GET.content_type %}content_type={{ request.GET.content_type|urlencode }}{% if request.GET.object or request.GET.page_size %}&amp;{% endif %}{% endif %}{% if request.GET.object %}object={{ request.GET.object|urlencode }}{% if request.GET.page_size %}&amp;{% endif %}{% endif %}{% if request.GET.page_size %}page_size={{ request.GET.page_size|urlencode }}{% endif %}">{% trans "Clear search" %}</a>
+                <a class="btn btn-default event-log-clear-search" href="?{{ clear_search_query }}">{% trans "Clear search" %}</a>
             {% endif %}
             <select name="user" class="form-control">
                 <option value="">{% trans "All actions" %}</option>

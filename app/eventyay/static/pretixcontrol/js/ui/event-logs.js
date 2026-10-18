@@ -38,7 +38,9 @@ function loadResults(url, updateHistory) {
     })
         .then((response) => {
             if (!response.ok) {
-                throw new Error("Event log request failed");
+                throw new Error(
+                    "Event log request failed with HTTP status " + response.status
+                );
             }
             return response.text();
         })
@@ -84,6 +86,13 @@ function loadResults(url, updateHistory) {
         })
         .catch((error) => {
             if (error.name === "AbortError" || version !== requestVersion) return;
+            console.error(
+                "Failed to load event logs via AJAX; falling back to navigation.",
+                {
+                    url: target.href,
+                    error,
+                }
+            );
             window.location.href = target.href;
         });
 }
