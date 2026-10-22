@@ -3,7 +3,7 @@ import pytest
 from django_scopes import scope
 from rest_framework.test import APIClient
 
-from eventyay.base.models import Product, ProductVariation
+from eventyay.base.models import Event, Product, ProductVariation
 
 
 @pytest.fixture
@@ -84,7 +84,10 @@ def test_create_quota_with_variations_but_without_products(
     )
 
     assert response.status_code == 400
-
+    assert (
+        'All variations must belong to an product contained in the products list.'
+        in str(response.data)
+    )
 
 @pytest.mark.django_db
 def test_create_quota_with_product_variations_but_without_variations(
@@ -112,3 +115,41 @@ def test_create_quota_with_product_variations_but_without_variations(
     )
 
     assert response.status_code == 400
+    assert (
+        'One or more products has variations but none of these are in the variations list.'
+        in str(response.data)
+    )
+
+
+@pytest.mark.django_db
+def test_create_quota_with_product_from_another_event(
+    token_client, organizer, event
+):
+    with scope(organizer=organizer, event=event):
+        other_event = Event.objects.create(
+            organizer=organizer,
+            name='Another event',
+            slug='another-event',
+            date_from=event.date_from,
+        )
+        product = Product.objects.create(
+            event=other_event,
+            name='Other event ticket',
+            default_price=10,
+        )
+
+    response = token_client.post(
+        quota_url(organizer, event),
+        {
+            'name': 'Main quota',
+            'size': 10,
+            'products': [product.pk],
+        },
+        format='json',
+    )
+
+    assert response.status_code == 400
+    assert (
+        'One or more products do not belong to this event.'
+        in str(response.data)
+    )
