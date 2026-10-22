@@ -1,6 +1,6 @@
 
 import pytest
-from django_scopes import scope, scopes_disabled
+from django_scopes import scope
 from rest_framework.test import APIClient
 
 from eventyay.base.models import Product, ProductVariation
@@ -37,7 +37,7 @@ def test_create_question_without_products(token_client, organizer, event):
 
     assert response.status_code == 201
 
-    with scopes_disabled():
+    with scope(event=event, organizer=organizer):
         question = event.questions.get(pk=response.data['id'])
         assert not question.products.exists()
 
