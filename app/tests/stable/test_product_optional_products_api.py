@@ -125,13 +125,15 @@ def test_create_quota_with_product_variations_but_without_variations(
 def test_create_quota_with_product_from_another_event(
     token_client, organizer, event
 ):
-    with scope(organizer=organizer, event=event):
+    with scope(organizer=organizer):
         other_event = Event.objects.create(
             organizer=organizer,
             name='Another event',
             slug='another-event',
             date_from=event.date_from,
         )
+
+    with scope(organizer=organizer, event=other_event):
         product = Product.objects.create(
             event=other_event,
             name='Other event ticket',

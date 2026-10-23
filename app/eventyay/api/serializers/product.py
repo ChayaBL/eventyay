@@ -465,7 +465,7 @@ class QuestionSerializer(I18nAwareModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         options_data = validated_data.pop('options') if 'options' in validated_data else []
-        products = validated_data.pop('products', [])
+        products = validated_data.pop('products', None) or []
 
         question = Question.objects.create(**validated_data)
         question.products.set(products)
